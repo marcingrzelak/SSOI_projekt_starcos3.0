@@ -35,26 +35,22 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        <Border Grid.Column="0" Grid.Row="0" BorderThickness="0,0,1,0" BorderBrush="White"></Border>
-        <Border Grid.Column="0" Grid.Row="1" BorderThickness="0,0,1,0" BorderBrush="White"></Border>
-        <Border Grid.Column="0" Grid.Row="2" BorderThickness="0,0,1,0" BorderBrush="White"></Border>
-        <Border Grid.Column="2" Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="White"/>
-        <Border Grid.Column="2" Grid.Row="1" BorderThickness="1,0,0,0" BorderBrush="White"></Border>
-        <Border Grid.Column="2" Grid.Row="2" BorderThickness="1,0,0,0" BorderBrush="White"></Border>
+        
+        <Border Grid.Column="1" Grid.RowSpan="3" BorderThickness="1,0,1,0" BorderBrush="White"></Border>
 
-        <Label Name="SelectClientReaderLabel" Content="Wybierz czytnik klienta:" Margin="10,10,0,0" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Foreground="White"/>
-        <ListBox Name="ClientReadersList" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0" SelectionMode="Single"/>
-        <Button Name="SelectClientReaderButton" Grid.Row="2" Content="Wybierz" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Width="145" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="SelectClientReaderButton_Click"/>
-        <Label Name="SelectedClientReaderLabel" Content="Wybrany czytnik:" Grid.Row="2" Height="30" HorizontalContentAlignment="Left" VerticalAlignment="Top" HorizontalAlignment="Left" Width="100" Margin="0,50.333,0,0" Background="Transparent" Foreground="White"/>
-        <TextBox Name="SelectedClientReaderTextBox" Text="Brak" Grid.Row="2" Height="36" TextWrapping="Wrap" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Right" Width="110" Margin="0,45.333,10,0" Background="Transparent" BorderThickness="0" Foreground="Red"/>
+        <Label Name="SelectClientReaderLabel" Content="Wybierz czytnik klienta:" Style="{StaticResource SelectReaderLabelStyle}"/>
+        <ListBox Name="ClientReadersList" Style="{StaticResource ReadersListStyle}" Grid.Row="1"/>
+        <Button Name="SelectClientReaderButton" Style="{StaticResource SelectReaderButtonStyle}" Grid.Row="2" Click="SelectClientReaderButton_Click"/>
+        <Label Name="SelectedClientReaderLabel" Style="{StaticResource SelectedReaderLabelStyle}" Grid.Row="2"/>
+        <TextBox Name="SelectedClientReaderTextBox" Style="{StaticResource SelectedReaderTextBoxStyle}" Grid.Row="2" />
 
-        <Label Name="SelectVendorReaderLabel" Grid.Column="3" Content="Wybierz czytnik sprzedawcy:" Margin="10,10,0,0" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Foreground="White"/>
-        <ListBox Name="VendorReadersList" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10,0,0,99.667" SelectionMode="Single" Grid.RowSpan="2" Width="200"/>
-        <Button Name="SelectVendorReaderButton" Grid.Row="2" Grid.Column="3" Content="Wybierz" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Width="145" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="SelectVendorReaderButton_Click"/>
-        <Label Name="SelectedVendorReaderLabel" Content="Wybrany czytnik:" Grid.Row="2" Grid.Column="3" Height="30" HorizontalContentAlignment="Left" VerticalAlignment="Top" HorizontalAlignment="Left" Width="100" Margin="0,50.333,0,0" Background="Transparent" Foreground="White"/>
-        <TextBox Name="SelectedVendorReaderTextBox" Text="Brak" Grid.Row="2" Grid.Column="3" Height="36" TextWrapping="Wrap" VerticalContentAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Right" Width="110" Margin="0,45.333,10,0" Background="Transparent" BorderThickness="0" Foreground="Red"/>
-        <ListView Name="ProductsListView" Grid.Column="1" HorizontalAlignment="Left" Height="159" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Top" Width="361">
-
+        <Label Name="SelectVendorReaderLabel" Content="Wybierz czytnik sprzedawcy:" Style="{StaticResource SelectReaderLabelStyle}" Grid.Column="3"/>
+        <ListBox Name="VendorReadersList" Style="{StaticResource ReadersListStyle}" Grid.Row="1" Grid.Column="2"/>
+        <Button Name="SelectVendorReaderButton" Style="{StaticResource SelectReaderButtonStyle}" Grid.Row="2" Grid.Column="3" Click="SelectVendorReaderButton_Click"/>
+        <Label Name="SelectedVendorReaderLabel" Style="{StaticResource SelectedReaderLabelStyle}" Grid.Row="2" Grid.Column="3" />
+        <TextBox Name="SelectedVendorReaderTextBox" Style="{StaticResource SelectedReaderTextBoxStyle}" Grid.Row="2" Grid.Column="3"/>
+        
+        <ListView Name="ProductsListView" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Stretch" Width="361">
             <ListView.Resources>
                 <Style TargetType="{x:Type GridViewColumnHeader}">
                     <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -63,9 +59,9 @@
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="40" CellTemplate="{StaticResource CheckBoxTemplate}"/>
-                    <GridViewColumn Header="Towar" Width="150" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Cena (PLN)" Width="70" DisplayMemberBinding="{Binding Price}"/>
+                    <GridViewColumn Header="Koszyk" Width="50" CellTemplate="{StaticResource CheckBoxTemplate}"/>
+                    <GridViewColumn Header="Towar" Width="140" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Cena (PLN)" Width="70" DisplayMemberBinding="{Binding Price, StringFormat='0.00'}"/>
                     <GridViewColumn Header="Ilość" Width="65" CellTemplate="{StaticResource TextBoxTemplate}"/>
                 </GridView>
             </ListView.View>
@@ -73,9 +69,7 @@
 
         <Label Content="SUMA:" Grid.Column="1" HorizontalAlignment="Left" Margin="9.667,10,0,0" Grid.Row="2" VerticalAlignment="Top" Foreground="White"/>
         <TextBox Name="SumTextBox" Text="0 PLN" Grid.Column="1" HorizontalAlignment="Left" Height="21" Margin="55.667,15.333,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" Width="315" BorderThickness="0" Background="Transparent" Foreground="White"/>
-
-
-
+        <Button Name="SummaryButton"  Content="Podsumowanie" Style="{StaticResource TransactionSummaryButtonStyle}" Grid.Column="1" Grid.Row="2" Click="SummaryButton_Click"/>
 
     </Grid>
 </Window>

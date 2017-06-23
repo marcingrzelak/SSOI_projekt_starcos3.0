@@ -34,9 +34,13 @@ namespace Eportmonetka
         public TransactionWindow()
         {
             InitializeComponent();
-            Items.Add(new Product() { IsChecked = false, Name = "Piwo", Price = 4, Quantity = 0 });
-            Items.Add(new Product() { IsChecked = false, Name = "Wódka", Price = 20, Quantity = 0 });
-            Items.Add(new Product() { IsChecked = false, Name = "Likier", Price = 10, Quantity = 0 });
+            Items.Add(new Product() { IsChecked = false, Name = "Towar6", Price = 4.00, Quantity = 0 });
+            Items.Add(new Product() { IsChecked = false, Name = "Towar2", Price = 20.00, Quantity = 0 });
+            Items.Add(new Product() { IsChecked = false, Name = "Towar1", Price = 10.00, Quantity = 0 });
+            Items.Add(new Product() { IsChecked = false, Name = "Towar5", Price = 7.99, Quantity = 0 });
+            Items.Add(new Product() { IsChecked = false, Name = "Towar3", Price = 12.99, Quantity = 0 });
+            Items.Add(new Product() { IsChecked = false, Name = "Towar4", Price = 3.59, Quantity = 0 });
+
             ProductsListView.ItemsSource = Items;
 
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(ProductsListView.ItemsSource);
@@ -86,6 +90,21 @@ namespace Eportmonetka
             }
 
             SumTextBox.Text = sum.ToString() + " PLN";
+        }
+
+        private void SummaryButton_Click(object sender, RoutedEventArgs e)
+        {
+            string shopList = "";
+            foreach (var item in Items)
+            {
+                if (item.IsChecked)
+                {
+                    shopList += item.Name + " " + item.Quantity.ToString() + "x" + item.Price.ToString() + " ";
+                }
+            }
+            shopList += "SUMA: " + SumTextBox.Text;
+            TransactionSummaryWindow window = new TransactionSummaryWindow();
+            window.ShowDialog();
         }
     }
 }

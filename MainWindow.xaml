@@ -13,6 +13,7 @@
                 <GradientStop Color="#FF4FC3F7" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
@@ -23,7 +24,7 @@
         </Grid.RowDefinitions>
 
         <Button Name="InitButton" Grid.Column="0" Grid.Row="0" Content="Inicjalizacja karty" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="InitButton_Click"></Button>
-        <Button Name="TransactionButton" Grid.Column="1" Grid.Row="0" Content="Rozpocznij transakcję" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="TransactionButton_Click"></Button>
-        <Button Name="RechargeButton" Grid.Column="0" Grid.Row="1" Content="Doładowanie karty" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="RechargeButton_Click"></Button>
+        <Button Name="RechargeButton" Grid.Column="1" Grid.Row="0"  Content="Doładowanie karty" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="RechargeButton_Click"></Button>
+        <Button Name="TransactionButton" Grid.ColumnSpan="2" Grid.Row="1" Content="Rozpocznij transakcję" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="TransactionButton_Click"></Button>
     </Grid>
 </Window>
