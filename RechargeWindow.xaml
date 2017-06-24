@@ -22,20 +22,25 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        
+
         <Border Grid.Column="0" Grid.RowSpan="3" BorderThickness="0,0,1,0" BorderBrush="White"></Border>
 
         <Label Name="SelectReaderLabel" Content="Wybierz czytnik:" Style="{StaticResource SelectReaderLabelStyle}" />
-        <ListBox Name="ReadersList" Style="{StaticResource ReadersListStyle}" Grid.Row="1" />
+        <ListBox Name="ReadersList" Style="{StaticResource ReadersListStyle}" Grid.Row="1" SelectionChanged="ReadersList_SelectionChanged" />
         <Button Name="SelectReaderButton" Style="{StaticResource SelectReaderButtonStyle}" Grid.Row="2"  Click="SelectReaderButton_Click"/>
         <Label Name="SelectedReaderLabel" Style="{StaticResource SelectedReaderLabelStyle}" Grid.Row="2"/>
         <TextBox Name="SelectedReaderTextBox" Style="{StaticResource SelectedReaderTextBoxStyle}" Grid.Row="2" />
-        
-        <Label Name="AmountLabel" Content="Kwota doładowania:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="10,10,0,0" Foreground="White"/>
-        <Slider Name="AmountSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,14,0,0" Grid.Column="1" Width="180" Minimum="1" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Height="20"/>
-        <TextBox Name="AmountTextBox" Text="{Binding ElementName=AmountSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" TextAlignment="Center" Margin="0,14,17,0" Height="20" Width="42" Foreground="White" Background="Transparent" BorderBrush="White"/>
 
-        <Button Name="RechargeButton" Content="Doładuj" Style="{StaticResource InitRechargeButtonStyle}" Click="RechargeButton_Click" />
+        <Label Name="CurrentBalanceLabel" Content="Aktualny stan konta:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="10,10,0,0" Foreground="White" />
+        <Label Name="CurrentBalanceTextBox" Content="0 PLN" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" HorizontalContentAlignment="Left" Margin="131,10,0,0" Height="26" Width="61" Foreground="White" Background="Transparent" BorderBrush="White" BorderThickness="0"/>
+
+
+        <Label Name="AmountLabel" Content="Kwota doładowania:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Margin="10,10,0,0" Foreground="White"/>
+        <Slider Name="AmountSlider" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,14,20,0" Grid.Column="1" Grid.Row="1" Width="163" Minimum="1" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Height="20"/>
+        <TextBox Name="AmountTextBox" Text="{Binding ElementName=AmountSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" TextAlignment="Left" Margin="131,10,0,0" Height="26" Width="28" Foreground="White" Background="Transparent" BorderBrush="White" BorderThickness="0,0,0,1"/>
+
+        <Button Name="RechargeButton" Content="Doładuj" Style="{StaticResource InitRechargeButtonStyle}" IsEnabled="True" Click="RechargeButton_Click" />
         <TextBox Name="RechargeStatusTextBox" Style="{StaticResource InitRechargeStatusTextBoxStyle}"/>
+        <Label x:Name="PLNLabel" Content="PLN" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" HorizontalContentAlignment="Left" Margin="159,10,0,0" Height="26" Width="33" Foreground="White" Background="Transparent" BorderBrush="White" BorderThickness="0" Grid.Row="1"/>
     </Grid>
 </Window>

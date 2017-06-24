@@ -28,6 +28,9 @@ namespace Eportmonetka
         public PCSCReader Reader { get; set; } = new PCSCReader();
         public ConsoleTraceListener ConsoleTraceListener { get; set; } = new ConsoleTraceListener();
         public string[] Readers { get; set; }
+        public double CurrentBalance { get; set; }
+
+        private string _selectedReader;
 
         public RechargeWindow()
         {
@@ -37,14 +40,53 @@ namespace Eportmonetka
             ReadersList.ItemsSource = Readers;
         }
 
+        private void Connect()
+        {
+            Reader.Connect(_selectedReader);
+            Reader.ActivateCard(GS.SCard.Const.SCARD_SHARE_MODE.Shared, GS.SCard.Const.SCARD_PROTOCOL.T1);
+        }
+
         private void RechargeButton_Click(object sender, RoutedEventArgs e)
         {
-            RechargeStatusTextBox.Text = "Karta doładowana, " + AmountTextBox.Text + "PLN";
+            //#todo
+            //wysylanie ramek APDU do karty - doładowanie
+            //zmiana stanu konta (textBox)
+            RechargeStatusTextBox.Foreground = Brushes.Green;
+            RechargeStatusTextBox.Text = "Karta doładowana kwotą " + AmountTextBox.Text + " PLN";
         }
 
         private void SelectReaderButton_Click(object sender, RoutedEventArgs e)
         {
-            SelectedReaderTextBox.Text = "OMNIKEY READER CL 0 5637";
+            if (!string.IsNullOrEmpty(_selectedReader))
+            {
+                try
+                {
+                    Connect();
+                }
+                catch (WinSCardException ex)
+                {
+                    MessageBox.Show(ex.WinSCardFunctionName + " Błąd 0x" + ex.Status.ToString("X08") + ": " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+                SelectedReaderTextBox.Foreground = Brushes.Green;
+                SelectedReaderTextBox.Text = _selectedReader;
+                RechargeButton.IsEnabled = true;
+                //#todo
+                //wysylanie ramek APDU do karty - odczyt stanu konta
+            }
+            else
+            {
+                MessageBox.Show("Zaznacz czytnik!");
+            }
+        }
+
+        private void ReadersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedReader = ReadersList.SelectedItem.ToString();
         }
     }
 }

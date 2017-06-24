@@ -22,37 +22,33 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        
+
         <Border Grid.Column="0" Grid.RowSpan="3" BorderThickness="0,0,1,0" BorderBrush="White"></Border>
 
         <Label Name="SelectReaderLabel" Content="Wybierz czytnik:" Style="{StaticResource SelectReaderLabelStyle}" />
-        <ListBox Name="ReadersList" Style="{StaticResource ReadersListStyle}" Grid.Row="1" />
+        <ListBox Name="ReadersList" Style="{StaticResource ReadersListStyle}" Grid.Row="1" SelectionChanged="ReadersList_SelectionChanged" />
         <Button Name="SelectReaderButton" Style="{StaticResource SelectReaderButtonStyle}" Grid.Row="2"  Click="SelectReaderButton_Click"/>
         <Label Name="SelectedReaderLabel" Style="{StaticResource SelectedReaderLabelStyle}" Grid.Row="2"/>
         <TextBox Name="SelectedReaderTextBox" Style="{StaticResource SelectedReaderTextBoxStyle}" Grid.Row="2" />
-        
-        <GroupBox Name="TypeLabel" Grid.RowSpan="2" Header="Typ karty:" Foreground="White" BorderBrush="White" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="25,14,0,0" Height="120" Width="125">
+
+        <GroupBox Name="TypeGroupBox" Grid.RowSpan="2" Header="Typ karty:" Foreground="White" BorderBrush="White" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="25,14,0,0" Height="130" Width="125" IsEnabled="False">
             <Grid>
-                <Menu Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0">
-                    <RadioButton Content="Klient" Foreground="White"/>
-                    <RadioButton Content="Sprzedawca" Foreground="White"/>
-                </Menu>
+                <RadioButton Name="ClientRadioButton"  Content="Klient" Foreground="White" HorizontalAlignment="Stretch" Height="15" Margin="0,5,0,88"/>
+                <RadioButton Name="VendorRadioButton" Content="Sprzedawca" Foreground="White" HorizontalAlignment="Stretch" Height="15" Margin="0,25,0,68"/>
             </Grid>
         </GroupBox>
 
-        <GroupBox Name="InitAmountLabel" Grid.RowSpan="2" Header="Kwota początkowa:" Foreground="White" BorderBrush="White" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Margin="0,14,25,0" Height="120" Width="125">
+        <GroupBox Name="InitAmountGroupBox" Grid.RowSpan="2" Header="Kwota początkowa:" Foreground="White" BorderBrush="White" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Margin="0,14,25,0" Height="130" Width="125" IsEnabled="False">
             <Grid>
-                <Menu Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0">
-                    <RadioButton Content="5 PLN" Foreground="White"/>
-                    <RadioButton Content="10 PLN" Foreground="White"/>
-                    <RadioButton Content="20 PLN" Foreground="White"/>
-                    <RadioButton Content="50 PLN" Foreground="White"/>
-                    <RadioButton Content="100 PLN" Foreground="White"/>
-                </Menu>
+                <RadioButton Name="InitAmount1RadioButton" Content="5 PLN" Foreground="White" HorizontalAlignment="Stretch" Height="15" Margin="0,5,0,88"/>
+                <RadioButton Name="InitAmount2RadioButton" Content="10 PLN" Foreground="White" HorizontalAlignment="Stretch" Height="15" Margin="0,25,0,68"/>
+                <RadioButton Name="InitAmount3RadioButton" Content="20 PLN" Foreground="White" HorizontalAlignment="Stretch" Height="15" Margin="0,45,0,48"/>
+                <RadioButton Name="InitAmount4RadioButton" Content="50 PLN" Foreground="White" HorizontalAlignment="Stretch" Height="15" Margin="0,65,0,28"/>
+                <RadioButton Name="InitAmount5RadioButton" Content="100 PLN" Foreground="White" HorizontalAlignment="Stretch" Height="15" Margin="0,85,0,8"/>
             </Grid>
         </GroupBox>
 
-        <Button Name="InitButton" Content="Inicjalizuj" Style="{StaticResource InitRechargeButtonStyle}" Click="InitButton_Click"/>
+        <Button Name="InitButton" Content="Inicjalizuj" Style="{StaticResource InitRechargeButtonStyle}" Click="InitButton_Click" IsEnabled="True"/>
         <TextBox Name="InitStatusTextBox" Style="{StaticResource InitRechargeStatusTextBoxStyle}" />
     </Grid>
 </Window>

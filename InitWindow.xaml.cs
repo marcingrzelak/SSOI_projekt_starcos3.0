@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,8 +12,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Forms;
-using System.Windows.Threading;
+using System.Diagnostics;
+using GS.Apdu;
+using GS.PCSC;
+using GS.SCard;
+using GS.Util.Hex;
 
 namespace Eportmonetka
 {
@@ -21,38 +25,125 @@ namespace Eportmonetka
     /// </summary>
     public partial class InitWindow : Window
     {
-        static DispatcherTimer timer = new DispatcherTimer();
-        int stop = 0;
+        public PCSCReader Reader { get; set; } = new PCSCReader();
+        public ConsoleTraceListener ConsoleTraceListener { get; set; } = new ConsoleTraceListener();
+        public string[] Readers { get; set; }
+        public bool IsSelectedType { get; set; }
+        public bool IsSelectedInitAmount { get; set; }
 
-        private void timer_Tick(Object myObject, EventArgs myEventArgs)
-        {
-            Width += 20;
-            stop++;
-
-            if (stop == 19)
-            {
-                timer.Stop();
-                stop = 0;
-            }
-        }
+        private string _selectedReader;
+        RadioButton[] Types = new RadioButton[2];
+        RadioButton[] InitAmounts = new RadioButton[5];
 
         public InitWindow()
         {
             InitializeComponent();
-            timer.Tick += timer_Tick;
-            timer.Interval = TimeSpan.FromMilliseconds(10);
-            ResizeMode = ResizeMode.NoResize;
+            Trace.Listeners.Add(ConsoleTraceListener);
+            Readers = Reader.SCard.ListReaders();
+            ReadersList.ItemsSource = Readers;
+
+            Types[0] = ClientRadioButton;
+            Types[1] = VendorRadioButton;
+
+            InitAmounts[0] = InitAmount1RadioButton;
+            InitAmounts[1] = InitAmount2RadioButton;
+            InitAmounts[2] = InitAmount3RadioButton;
+            InitAmounts[3] = InitAmount4RadioButton;
+            InitAmounts[4] = InitAmount5RadioButton;
         }
 
-        private void SelectReaderButton_Click(object sender, RoutedEventArgs e)
+        private void Connect()
         {
-            SelectedReaderTextBox.Text = "OMNIKEY READER CL 0 5637";
-            //timer.Start();
+            Reader.Connect(_selectedReader);
+            Reader.ActivateCard(GS.SCard.Const.SCARD_SHARE_MODE.Shared, GS.SCard.Const.SCARD_PROTOCOL.T1);
+        }
+
+        private void CheckSelection()
+        {
+            foreach (var item in Types)
+            {
+                if (item.IsChecked == true)
+                {
+                    IsSelectedType = true;
+                }
+            }
+
+            foreach (var item in InitAmounts)
+            {
+                if (item.IsChecked == true)
+                {
+                    IsSelectedInitAmount = true;
+                }
+            }
         }
 
         private void InitButton_Click(object sender, RoutedEventArgs e)
         {
-            InitStatusTextBox.Text = "Karta zainicjalizowana";
+            CheckSelection();
+            if (IsSelectedType == true && IsSelectedInitAmount == true)
+            {
+                //#todo
+                //wysylanie ramek APDU do karty - inicjalizacja
+                InitStatusTextBox.Foreground = Brushes.Green;
+                InitStatusTextBox.Text = "Karta zainicjalizowana!";
+            }
+
+            else
+            {
+                InitStatusTextBox.Foreground = Brushes.Red;
+
+                if(IsSelectedType==false && IsSelectedInitAmount==true)
+                {
+                    InitStatusTextBox.Text = "Wybierz typ!";
+                }
+
+                else if (IsSelectedType == true && IsSelectedInitAmount == false)
+                {
+                    InitStatusTextBox.Text = "Wybierz kwotę początkową!";
+                }
+
+                else
+                {
+                    InitStatusTextBox.Text = "Wybierz typ i kwotę początkową!";
+                }
+
+            }
+        }
+
+        private void SelectReaderButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_selectedReader))
+            {
+                try
+                {
+                    Connect();
+                }
+                catch (WinSCardException ex)
+                {
+                    MessageBox.Show(ex.WinSCardFunctionName + " Błąd 0x" + ex.Status.ToString("X08") + ": " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+                //#todo
+                //wysylanie ramek APDU do karty - sprawdzenie czy karta jest już zainicjalizowana
+                SelectedReaderTextBox.Text = _selectedReader;
+                SelectedReaderLabel.Foreground = Brushes.Green;
+                InitButton.IsEnabled = true;
+                TypeGroupBox.IsEnabled = true;
+                InitAmountGroupBox.IsEnabled = true;
+            }
+            else
+            {
+                MessageBox.Show("Zaznacz czytnik!");
+            }
+        }
+
+        private void ReadersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedReader = ReadersList.SelectedItem.ToString();
         }
     }
 }
