@@ -35,12 +35,19 @@ namespace Eportmonetka
         RadioButton[] Types = new RadioButton[2];
         RadioButton[] InitAmounts = new RadioButton[5];
 
+        BrushConverter converter = new BrushConverter();
+        Brush ErrorBrush, AccentBrush;
+
+
         public InitWindow()
         {
             InitializeComponent();
             Trace.Listeners.Add(ConsoleTraceListener);
             Readers = Reader.SCard.ListReaders();
             ReadersList.ItemsSource = Readers;
+
+            ErrorBrush = (Brush)converter.ConvertFromString("#FFD0284C");
+            AccentBrush = (Brush)converter.ConvertFromString("#FF0086AF");            
 
             Types[0] = ClientRadioButton;
             Types[1] = VendorRadioButton;
@@ -84,13 +91,13 @@ namespace Eportmonetka
             {
                 //#todo
                 //wysylanie ramek APDU do karty - inicjalizacja
-                InitStatusTextBox.Foreground = Brushes.Green;
+                InitStatusTextBox.Foreground = AccentBrush;
                 InitStatusTextBox.Text = "Karta zainicjalizowana!";
             }
 
             else
             {
-                InitStatusTextBox.Foreground = Brushes.Red;
+                InitStatusTextBox.Foreground = ErrorBrush;
 
                 if(IsSelectedType==false && IsSelectedInitAmount==true)
                 {
@@ -130,7 +137,7 @@ namespace Eportmonetka
                 //#todo
                 //wysylanie ramek APDU do karty - sprawdzenie czy karta jest już zainicjalizowana
                 SelectedReaderTextBox.Text = _selectedReader;
-                SelectedReaderLabel.Foreground = Brushes.Green;
+                SelectedReaderLabel.Foreground = AccentBrush;
                 InitButton.IsEnabled = true;
                 TypeGroupBox.IsEnabled = true;
                 InitAmountGroupBox.IsEnabled = true;

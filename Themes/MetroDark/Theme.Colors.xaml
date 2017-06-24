@@ -2,7 +2,7 @@
 
   <!-- ********************************** THEME BRUSHES - For Color Tuner **********************************-->
   <SolidColorBrush x:Key="Brush01" Color="#FF00AADE" />
-  <SolidColorBrush x:Key="Brush02" Color="White" />
+  <SolidColorBrush x:Key="Brush02" Color="#BABABA" />
   <SolidColorBrush x:Key="Brush03" Color="#FFC6C6C6" />
   <SolidColorBrush x:Key="Brush04" Color="#FF565656" />
   <SolidColorBrush x:Key="Brush05" Color="#FF333333" />
@@ -20,37 +20,37 @@
   <Color x:Key="Color_008">#FF292929</Color>
   <Color x:Key="Color_009">#FF181818</Color>
 
-  <!--Transparent and Whites with transparency-->
+  <!--Transparent and Blacks with transparency-->
   <Color x:Key="Color_010">#E5FFFFFF</Color>
-  <!--90% White-->
+  <!--90% #BABABA-->
   <Color x:Key="Color_011">#BFFFFFFF</Color>
-  <!--75% White-->
+  <!--75% #BABABA-->
   <Color x:Key="Color_012">#99FFFFFF</Color>
-  <!--60% White-->
+  <!--60% #BABABA-->
   <Color x:Key="Color_013">#72FFFFFF</Color>
-  <!--45% White-->
+  <!--45% #BABABA-->
   <Color x:Key="Color_014">#4CFFFFFF</Color>
-  <!--30% White-->
+  <!--30% #BABABA-->
   <Color x:Key="Color_015">#26FFFFFF</Color>
-  <!--15% White-->
+  <!--15% #BABABA-->
   <Color x:Key="Color_016">#00FFFFFF</Color>
-  <!--0% White-->
+  <!--0% #BABABA-->
 
   <!--Blacks and grays with transparency-->
   <Color x:Key="Color_069">#E5000000</Color>
-  <!--90% Black-->
+  <!--90% #BABABA-->
   <Color x:Key="Color_070">#BF000000</Color>
-  <!--75% Black-->
+  <!--75% #BABABA-->
   <Color x:Key="Color_017">#99000000</Color>
-  <!--60% Black-->
+  <!--60% #BABABA-->
   <Color x:Key="Color_018">#72000000</Color>
-  <!--45% Black-->
+  <!--45% #BABABA-->
   <Color x:Key="Color_019">#4C000000</Color>
-  <!--30% Black-->
+  <!--30% #BABABA-->
   <Color x:Key="Color_020">#26000000</Color>
-  <!--15% Black-->
+  <!--15% #BABABA-->
   <Color x:Key="Color_021">#00000000</Color>
-  <!--0% Black-->
+  <!--0% #BABABA-->
   <Color x:Key="Color_022">#66E2E2E2</Color>
 
   <!--Theme Accent colors -->

@@ -31,6 +31,8 @@ namespace Eportmonetka
         public double CurrentBalance { get; set; }
 
         private string _selectedReader;
+        BrushConverter converter = new BrushConverter();
+        Brush AccentBrush;
 
         public RechargeWindow()
         {
@@ -38,6 +40,8 @@ namespace Eportmonetka
             Trace.Listeners.Add(ConsoleTraceListener);
             Readers = Reader.SCard.ListReaders();
             ReadersList.ItemsSource = Readers;
+
+            AccentBrush = (Brush)converter.ConvertFromString("#FF0086AF");
         }
 
         private void Connect()
@@ -51,7 +55,7 @@ namespace Eportmonetka
             //#todo
             //wysylanie ramek APDU do karty - doładowanie
             //zmiana stanu konta (textBox)
-            RechargeStatusTextBox.Foreground = Brushes.Green;
+            RechargeStatusTextBox.Foreground = AccentBrush;
             RechargeStatusTextBox.Text = "Karta doładowana kwotą " + AmountTextBox.Text + " PLN";
         }
 
@@ -72,7 +76,7 @@ namespace Eportmonetka
                     MessageBox.Show(ex.Message);
                 }
 
-                SelectedReaderTextBox.Foreground = Brushes.Green;
+                SelectedReaderTextBox.Foreground = AccentBrush;
                 SelectedReaderTextBox.Text = _selectedReader;
                 RechargeButton.IsEnabled = true;
                 //#todo

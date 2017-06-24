@@ -6,14 +6,8 @@
         xmlns:local="clr-namespace:Eportmonetka"
         mc:Ignorable="d"
         Title="Epormonetka" Height="400" Width="400" MinHeight="400" MinWidth="400">
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                <GradientStop Color="#FF01579B" Offset="0"/>
-                <GradientStop Color="#FF4FC3F7" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        
+    <Grid Background="#FF181818">
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
@@ -23,8 +17,8 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
-        <Button Name="InitButton" Grid.Column="0" Grid.Row="0" Content="Inicjalizacja karty" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="InitButton_Click"></Button>
-        <Button Name="RechargeButton" Grid.Column="1" Grid.Row="0"  Content="Doładowanie karty" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="RechargeButton_Click"></Button>
-        <Button Name="TransactionButton" Grid.ColumnSpan="2" Grid.Row="1" Content="Rozpocznij transakcję" Margin="10,10,10,10" BorderBrush="White" Foreground="White" FontSize="16" FontWeight="Bold" Background="Transparent" Click="TransactionButton_Click"></Button>
+        <Button Name="InitButton" Grid.Column="0" Grid.Row="0" Content="Inicjalizacja karty" Margin="10,10,10,10" BorderBrush="#BABABA" Foreground="#BABABA" FontSize="16" FontWeight="Bold" Background="Transparent" Click="InitButton_Click"></Button>
+        <Button Name="RechargeButton" Grid.Column="1" Grid.Row="0"  Content="Doładowanie karty" Margin="10,10,10,10" BorderBrush="#BABABA" Foreground="#BABABA" FontSize="16" FontWeight="Bold" Background="Transparent" Click="RechargeButton_Click"></Button>
+        <Button Name="TransactionButton" Grid.ColumnSpan="2" Grid.Row="1" Content="Rozpocznij transakcję" Margin="10,10,10,10" BorderBrush="#BABABA" Foreground="#BABABA" FontSize="16" FontWeight="Bold" Background="Transparent" Click="TransactionButton_Click"></Button>
     </Grid>
 </Window>

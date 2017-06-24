@@ -39,6 +39,9 @@ namespace Eportmonetka
         private string _selectedClientReader;
         private string _selectedVendorReader;
 
+        BrushConverter converter = new BrushConverter();
+        Brush ForegroundBrush, ErrorBrush, AccentBrush;
+
         public class Product
         {
             public bool IsChecked { get; set; }
@@ -53,10 +56,16 @@ namespace Eportmonetka
         {
             InitializeComponent();
             Trace.Listeners.Add(ConsoleTraceListener);
+
             ClientReaders = ClientReader.SCard.ListReaders();
             ClientReadersList.ItemsSource = ClientReaders;
+
             VendorReaders = VendorReader.SCard.ListReaders();
             VendorReadersList.ItemsSource = VendorReaders;
+
+            ForegroundBrush = (Brush)converter.ConvertFromString("#BABABA");
+            ErrorBrush = (Brush)converter.ConvertFromString("#FFD0284C");
+            AccentBrush = (Brush)converter.ConvertFromString("#FF0086AF");
 
             Items.Add(new Product() { IsChecked = false, Name = "Towar1", Price = 4.00, Quantity = 0 });
             Items.Add(new Product() { IsChecked = false, Name = "Towar2", Price = 20.00, Quantity = 0 });
@@ -94,7 +103,7 @@ namespace Eportmonetka
                     MessageBox.Show(ex.Message);
                 }
 
-                SelectedClientReaderTextBox.Foreground = Brushes.Green;
+                SelectedClientReaderTextBox.Foreground = AccentBrush;
                 SelectedClientReaderTextBox.Text = _selectedClientReader;
                 IsSelectedClientReader = true;
                 if(IsSelectedVendorReader==true)
@@ -129,7 +138,7 @@ namespace Eportmonetka
                     MessageBox.Show(ex.Message);
                 }
 
-                SelectedVendorReaderTextBox.Foreground = Brushes.Green;
+                SelectedVendorReaderTextBox.Foreground = AccentBrush;
                 SelectedVendorReaderTextBox.Text = _selectedVendorReader;
                 IsSelectedVendorReader = true;
                 if (IsSelectedClientReader==true)
@@ -164,7 +173,7 @@ namespace Eportmonetka
             }
             else
             {
-                SumTextBox.Foreground = Brushes.White;
+                SumTextBox.Foreground = ForegroundBrush;
                 (sender as TextBox).GetBindingExpression(TextBox.TextProperty).UpdateSource();
             }
             SumTextBox.Text = sum.ToString() + " PLN";
@@ -189,7 +198,7 @@ namespace Eportmonetka
             }
             else
             {
-                SumTextBox.Foreground = Brushes.White;
+                SumTextBox.Foreground = ForegroundBrush;
             }
 
             SumTextBox.Text = sum.ToString() + " PLN";

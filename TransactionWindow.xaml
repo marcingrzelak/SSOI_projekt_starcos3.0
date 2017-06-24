@@ -18,13 +18,8 @@
 
     </Window.Resources>
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FF01579B" Offset="0"/>
-                <GradientStop Color="#FF4FC3F7" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid Background="#181818">
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220" />
             <ColumnDefinition Width="380" />
@@ -36,7 +31,7 @@
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
         
-        <Border Grid.Column="1" Grid.RowSpan="3" BorderThickness="1,0,1,0" BorderBrush="White"></Border>
+        <Border Grid.Column="1" Grid.RowSpan="3" BorderThickness="1,0,1,0" BorderBrush="#BABABA"></Border>
 
         <Label Name="SelectClientReaderLabel" Content="Wybierz czytnik klienta:" Style="{StaticResource SelectReaderLabelStyle}"/>
         <ListBox Name="ClientReadersList" Style="{StaticResource ReadersListStyle}" Grid.Row="1" SelectionChanged="ClientReadersList_SelectionChanged"/>
@@ -50,10 +45,10 @@
         <Label Name="SelectedVendorReaderLabel" Style="{StaticResource SelectedReaderLabelStyle}" Grid.Row="2" Grid.Column="3" />
         <TextBox Name="SelectedVendorReaderTextBox" Style="{StaticResource SelectedReaderTextBoxStyle}" Grid.Row="2" Grid.Column="3"/>
 
-        <Label Name="CurrentBalanceLabel" Content="Stan konta klienta:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="10,10,0,0" Foreground="White" />
-        <Label Name="CurrentBalanceTextBox" Content="0 PLN" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" HorizontalContentAlignment="Left" Margin="117,10,0,0" Height="26" Width="50" Foreground="White" Background="Transparent" BorderBrush="White" BorderThickness="0"/>
+        <Label Name="CurrentBalanceLabel" Content="Stan konta klienta:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="10,10,0,0" Foreground="#BABABA" />
+        <Label Name="CurrentBalanceTextBox" Content="0 PLN" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" HorizontalContentAlignment="Left" Margin="117,10,0,0" Height="26" Width="50" Foreground="#BABABA" Background="Transparent" BorderBrush="#BABABA" BorderThickness="0"/>
 
-        <ListView Name="ProductsListView" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Stretch" Width="361" IsEnabled="True">
+        <ListView Name="ProductsListView" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Stretch" Width="361" IsEnabled="True" Background="#181818" BorderBrush="#BABABA" Foreground="#BABABA">
             <ListView.Resources>
                 <Style TargetType="{x:Type GridViewColumnHeader}">
                     <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -63,15 +58,15 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Koszyk" Width="50" CellTemplate="{StaticResource CheckBoxTemplate}"/>
-                    <GridViewColumn Header="Towar" Width="140" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Towar" Width="140" DisplayMemberBinding="{Binding Name}" />
                     <GridViewColumn Header="Cena (PLN)" Width="70" DisplayMemberBinding="{Binding Price, StringFormat='0.00'}"/>
                     <GridViewColumn Header="Ilość" Width="65" CellTemplate="{StaticResource TextBoxTemplate}"/>
                 </GridView>
             </ListView.View>
         </ListView>
 
-        <Label Content="Suma:" Grid.Column="1" HorizontalAlignment="Left" Margin="9.667,10,0,0" Grid.Row="2" VerticalAlignment="Top" Foreground="White"/>
-        <TextBox Name="SumTextBox" Text="0 PLN" Grid.Column="1" HorizontalAlignment="Left" Height="21" Margin="55.667,15.333,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" Width="315" BorderThickness="0" Background="Transparent" Foreground="White"/>
+        <Label Content="Suma:" Grid.Column="1" HorizontalAlignment="Left" Margin="9.667,10,0,0" Grid.Row="2" VerticalAlignment="Top" Foreground="#BABABA"/>
+        <TextBox Name="SumTextBox" Text="0 PLN" Grid.Column="1" HorizontalAlignment="Left" Height="21" Margin="55.667,15.333,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" Width="315" BorderThickness="0" Background="Transparent" Foreground="#BABABA"/>
         <Button Name="SummaryButton"  Content="Podsumowanie" Style="{StaticResource TransactionSummaryButtonStyle}" Grid.Column="1" Grid.Row="2" Click="SummaryButton_Click"/>
 
     </Grid>

@@ -11,6 +11,7 @@
                 <ResourceDictionary Source="Themes/MetroDark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>-->
+        
 
         <Style x:Key="SelectReaderButtonStyle" TargetType="Button">
             <Setter Property="Content" Value="Wybierz" />
@@ -19,9 +20,9 @@
             <Setter Property="Margin" Value="0,10,0,0" />
             <Setter Property="Height" Value="30" />
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="#BABABA" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="BorderBrush" Value="#BABABA" />
             <Setter Property="Width" Value="145" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
@@ -33,9 +34,9 @@
             <Setter Property="Margin" Value="0,0,0,23" />
             <Setter Property="Height" Value="30" />
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="#BABABA" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="BorderBrush" Value="#BABABA" />
             <Setter Property="Width" Value="145" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
@@ -47,7 +48,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="Margin" Value="0,50.333,0,0" />
             <Setter Property="Height" Value="30" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="#BABABA" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Width" Value="100" />
         </Style>
@@ -59,7 +60,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,45.333,10,0" />
             <Setter Property="Height" Value="36" />
-            <Setter Property="Foreground" Value="Red" />
+            <Setter Property="Foreground" Value="#FFD0284C" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Width" Value="110" />
             <Setter Property="BorderThickness" Value="0" />
@@ -71,6 +72,8 @@
             <Setter Property="VerticalAlignment" Value="Stretch" />
             <Setter Property="Margin" Value="10,0,10,0" />
             <Setter Property="SelectionMode" Value="Single" />
+            <Setter Property="Background" Value="#181818" />
+            <Setter Property="BorderBrush" Value="#BABABA" />
         </Style>
 
         <Style x:Key="SelectReaderLabelStyle" TargetType="Label">
@@ -79,7 +82,7 @@
             <Setter Property="Margin" Value="10,10,0,0" />
             <Setter Property="Height" Value="30" />
             <Setter Property="Width" Value="170" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="#BABABA" />
         </Style>
 
         <Style x:Key="InitRechargeButtonStyle" TargetType="Button">
@@ -89,11 +92,11 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Height" Value="45" />
             <Setter Property="Width" Value="80" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="#BABABA" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="BorderBrush" Value="#BABABA" />
         </Style>
 
         <Style x:Key="InitRechargeStatusTextBoxStyle" TargetType="TextBox">
@@ -104,7 +107,7 @@
             <Setter Property="Margin" Value="0,0,0,3" />
             <Setter Property="Height" Value="20" />
             <Setter Property="Width" Value="250" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="#BABABA" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="TextAlignment" Value="Center" />
