@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Eportmonetka"
         mc:Ignorable="d"
-        Title="Inicjalizacja karty" Height="330" Width="600">
+        Title="Inicjalizacja karty" Height="330" Width="600" ResizeMode="NoResize">
     <Grid Background="#FF181818">
 
         <Grid.ColumnDefinitions>
@@ -26,14 +26,14 @@
         <Label Name="SelectedReaderLabel" Style="{StaticResource SelectedReaderLabelStyle}" Grid.Row="2"/>
         <TextBox Name="SelectedReaderTextBox" Style="{StaticResource SelectedReaderTextBoxStyle}" Grid.Row="2" />
 
-        <GroupBox Name="TypeGroupBox" Grid.RowSpan="2" Header="Typ karty:" Foreground="#BABABA" BorderBrush="#BABABA" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="25,14,0,0" Height="130" Width="125" IsEnabled="True">
+        <GroupBox Name="TypeGroupBox" Grid.RowSpan="2" Header="Typ karty:" Foreground="#BABABA" BorderBrush="#BABABA" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="25,14,0,0" Height="130" Width="125" IsEnabled="False">
             <Grid>
-                <RadioButton Name="ClientRadioButton"  Content="Klient" Foreground="#BABABA" HorizontalAlignment="Stretch" Height="15" Margin="0,5,0,88"/>
-                <RadioButton Name="VendorRadioButton" Content="Sprzedawca" Foreground="#BABABA" HorizontalAlignment="Stretch" Height="15" Margin="0,25,0,68"/>
+                <RadioButton Name="ClientRadioButton" Content="Klient" Foreground="#BABABA" HorizontalAlignment="Stretch" Height="15" Margin="0,5,0,88" />
+                <RadioButton Name="VendorRadioButton" Content="Sprzedawca" Foreground="#BABABA" HorizontalAlignment="Stretch" Height="15" Margin="0,25,0,68" />
             </Grid>
         </GroupBox>
 
-        <GroupBox Name="InitAmountGroupBox" Grid.RowSpan="2" Header="Kwota początkowa:" Foreground="#BABABA" BorderBrush="#BABABA" BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Margin="0,14,25,0" Height="130" Width="125" IsEnabled="True">
+        <GroupBox Name="InitAmountGroupBox" Grid.RowSpan="2" Header="Kwota początkowa:" Foreground="#BABABA" BorderBrush="#BABABA" BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Margin="0,14,25,0" Height="130" Width="125" IsEnabled="False">
             <Grid>
                 <RadioButton Name="InitAmount1RadioButton" Content="5 PLN" Foreground="#BABABA" HorizontalAlignment="Stretch" Height="15" Margin="0,5,0,88"/>
                 <RadioButton Name="InitAmount2RadioButton" Content="10 PLN" Foreground="#BABABA" HorizontalAlignment="Stretch" Height="15" Margin="0,25,0,68"/>
@@ -43,7 +43,7 @@
             </Grid>
         </GroupBox>
 
-        <Button Name="InitButton" Content="Inicjalizuj" Style="{StaticResource InitRechargeButtonStyle}" Click="InitButton_Click" IsEnabled="True"/>
-        <TextBox Name="InitStatusTextBox" Style="{StaticResource InitRechargeStatusTextBoxStyle}" />
+        <Button Name="InitButton" Content="Inicjalizuj" Style="{StaticResource InitRechargeButtonStyle}" Click="InitButton_Click" IsEnabled="False"/>
+        <TextBox Name="InitStatusTextBox" Style="{StaticResource InitRechargeTransactionStatusTextBoxStyle}" />
     </Grid>
 </Window>

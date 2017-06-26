@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Diagnostics;
 using GS.Apdu;
 using GS.PCSC;
 using GS.SCard;
 using GS.Util.Hex;
+using static Eportmonetka.Constants.Commands;
+using static Eportmonetka.Constants.ThemeColors;
 
 namespace Eportmonetka
 {
@@ -30,6 +22,7 @@ namespace Eportmonetka
         public string[] Readers { get; set; }
         public bool IsSelectedType { get; set; }
         public bool IsSelectedInitAmount { get; set; }
+        public bool IsCardInitialized { get; set; }
 
         private string _selectedReader;
         RadioButton[] Types = new RadioButton[2];
@@ -38,7 +31,6 @@ namespace Eportmonetka
         BrushConverter converter = new BrushConverter();
         Brush ErrorBrush, AccentBrush;
 
-
         public InitWindow()
         {
             InitializeComponent();
@@ -46,8 +38,8 @@ namespace Eportmonetka
             Readers = Reader.SCard.ListReaders();
             ReadersList.ItemsSource = Readers;
 
-            ErrorBrush = (Brush)converter.ConvertFromString("#FFD0284C");
-            AccentBrush = (Brush)converter.ConvertFromString("#FF0086AF");            
+            ErrorBrush = (Brush)converter.ConvertFromString(Error);
+            AccentBrush = (Brush)converter.ConvertFromString(Accent);
 
             Types[0] = ClientRadioButton;
             Types[1] = VendorRadioButton;
@@ -89,8 +81,7 @@ namespace Eportmonetka
             CheckSelection();
             if (IsSelectedType == true && IsSelectedInitAmount == true)
             {
-                //#todo
-                //wysylanie ramek APDU do karty - inicjalizacja
+                InitCard();
                 InitStatusTextBox.Foreground = AccentBrush;
                 InitStatusTextBox.Text = "Karta zainicjalizowana!";
             }
@@ -99,7 +90,7 @@ namespace Eportmonetka
             {
                 InitStatusTextBox.Foreground = ErrorBrush;
 
-                if(IsSelectedType==false && IsSelectedInitAmount==true)
+                if (IsSelectedType == false && IsSelectedInitAmount == true)
                 {
                     InitStatusTextBox.Text = "Wybierz typ!";
                 }
@@ -119,6 +110,8 @@ namespace Eportmonetka
 
         private void SelectReaderButton_Click(object sender, RoutedEventArgs e)
         {
+            IsCardInitialized = false;
+
             if (!string.IsNullOrEmpty(_selectedReader))
             {
                 try
@@ -128,19 +121,33 @@ namespace Eportmonetka
                 catch (WinSCardException ex)
                 {
                     MessageBox.Show(ex.WinSCardFunctionName + " Błąd 0x" + ex.Status.ToString("X08") + ": " + ex.Message);
+                    return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
+                    return;
                 }
 
-                //#todo
-                //wysylanie ramek APDU do karty - sprawdzenie czy karta jest już zainicjalizowana
-                SelectedReaderTextBox.Text = _selectedReader;
-                SelectedReaderLabel.Foreground = AccentBrush;
-                InitButton.IsEnabled = true;
-                TypeGroupBox.IsEnabled = true;
-                InitAmountGroupBox.IsEnabled = true;
+                CheckInit();
+
+                if (IsCardInitialized)
+                {
+                    InitButton.IsEnabled = false;
+                    TypeGroupBox.IsEnabled = false;
+                    InitAmountGroupBox.IsEnabled = false;
+                    InitStatusTextBox.Foreground = ErrorBrush;
+                    InitStatusTextBox.Text = "Karta jest już zainicjalizowana";
+                }
+                else
+                {
+                    SelectedReaderTextBox.Text = _selectedReader;
+                    SelectedReaderTextBox.Foreground = AccentBrush;
+                    InitStatusTextBox.Text = "";
+                    InitButton.IsEnabled = true;
+                    TypeGroupBox.IsEnabled = true;
+                    InitAmountGroupBox.IsEnabled = true;
+                }                
             }
             else
             {
@@ -151,6 +158,107 @@ namespace Eportmonetka
         private void ReadersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedReader = ReadersList.SelectedItem.ToString();
+        }
+
+        private void SendApdu(string command)
+        {
+            try
+            {
+                RespApdu respApdu = Reader.Exchange(command);
+
+                if (respApdu.SW1SW2 == 0x9000)
+                {
+                    if (respApdu.Data != null)
+                    {
+                        if (command == ReadInfocard)
+                        {
+                            string CardResponse = HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", string.Empty);
+                            if (CardResponse == "10" || CardResponse == "01")
+                            {
+                                IsCardInitialized = true;
+                            }
+                        }
+                        InitStatusTextBox.Text += HexFormatting.ToHexString(respApdu.Data, true);
+                    }
+                    int response = Convert.ToInt32(respApdu.SW1SW2);
+                    InitStatusTextBox.Text += "Response: " + response.ToString("X").Insert(2, " ");
+                }
+                else
+                {
+                    int response = Convert.ToInt32(respApdu.SW1SW2);
+                    InitStatusTextBox.Text += "Error code: " + response.ToString("X").Insert(2, " ");
+                }
+            }
+            catch (Exception ex)
+            {
+                InitStatusTextBox.Text += ex.Message;
+            }
+        }
+
+        private void InitCard()
+        {
+            SendApdu(SelectMf);
+            SendApdu(SelectInfocard);
+
+            if (ClientRadioButton.IsChecked == true)
+            {
+                SendApdu(UpdateInfocardClient);
+            }
+            else if (VendorRadioButton.IsChecked == true)
+            {
+                SendApdu(UpdateInfocardVendor);
+            }
+
+            SendApdu(SelectDfUser);
+            SendApdu(ChangeUserPin + " 31 31 31 31 31 31 31 31");
+            SendApdu(UnlockUserPin + " 31 31 31 31 31 31 31 31");
+            SendApdu(SelectMf);
+            SendApdu(SelectDfBank);
+            SendApdu(ChangeBankPin + "32 32 32 32 32 32 32 32");
+            SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32");
+
+            if (ClientRadioButton.IsChecked == true)
+            {
+                SendApdu(SelectCash);
+
+                int index = 0;
+
+                for (int i = 0; i < InitAmounts.Length; i++)
+                {
+                    if (InitAmounts[i].IsChecked == true)
+                    {
+                        index = i;
+                    }
+                }
+
+                switch (index)
+                {
+                    case 0:
+                        SendApdu(UpdateCashInit1);
+                        break;
+                    case 1:
+                        SendApdu(UpdateCashInit2);
+                        break;
+                    case 2:
+                        SendApdu(UpdateCashInit3);
+                        break;
+                    case 3:
+                        SendApdu(UpdateCashInit4);
+                        break;
+                    case 4:
+                        SendApdu(UpdateCashInit5);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void CheckInit()
+        {
+            SendApdu(SelectMf);
+            SendApdu(SelectInfocard);
+            SendApdu(ReadInfocard);
         }
     }
 }

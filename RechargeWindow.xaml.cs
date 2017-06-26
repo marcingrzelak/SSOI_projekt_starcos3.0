@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Diagnostics;
 using GS.Apdu;
 using GS.PCSC;
 using GS.SCard;
 using GS.Util.Hex;
+using static Eportmonetka.Constants.Commands;
+using static Eportmonetka.Constants.ThemeColors;
 
 namespace Eportmonetka
 {
@@ -28,11 +20,13 @@ namespace Eportmonetka
         public PCSCReader Reader { get; set; } = new PCSCReader();
         public ConsoleTraceListener ConsoleTraceListener { get; set; } = new ConsoleTraceListener();
         public string[] Readers { get; set; }
-        public double CurrentBalance { get; set; }
+        public int CurrentBalance { get; set; }
+        public int RechargeAmount { get; set; }
+        public bool IsClientCardType { get; set; }
 
         private string _selectedReader;
         BrushConverter converter = new BrushConverter();
-        Brush AccentBrush;
+        Brush AccentBrush, ErrorBrush;
 
         public RechargeWindow()
         {
@@ -41,7 +35,8 @@ namespace Eportmonetka
             Readers = Reader.SCard.ListReaders();
             ReadersList.ItemsSource = Readers;
 
-            AccentBrush = (Brush)converter.ConvertFromString("#FF0086AF");
+            AccentBrush = (Brush)converter.ConvertFromString(Accent);
+            ErrorBrush = (Brush)converter.ConvertFromString(Error);
         }
 
         private void Connect()
@@ -52,15 +47,17 @@ namespace Eportmonetka
 
         private void RechargeButton_Click(object sender, RoutedEventArgs e)
         {
-            //#todo
-            //wysylanie ramek APDU do karty - doładowanie
-            //zmiana stanu konta (textBox)
+            RechargeCard();
             RechargeStatusTextBox.Foreground = AccentBrush;
             RechargeStatusTextBox.Text = "Karta doładowana kwotą " + AmountTextBox.Text + " PLN";
+            CurrentBalanceTextLabel.Content = ((double)RechargeAmount / 100).ToString("F2") + " PLN";
+            ReadCurrentBalance();
         }
 
         private void SelectReaderButton_Click(object sender, RoutedEventArgs e)
         {
+            IsClientCardType = false;
+
             if (!string.IsNullOrEmpty(_selectedReader))
             {
                 try
@@ -70,17 +67,37 @@ namespace Eportmonetka
                 catch (WinSCardException ex)
                 {
                     MessageBox.Show(ex.WinSCardFunctionName + " Błąd 0x" + ex.Status.ToString("X08") + ": " + ex.Message);
+                    return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
+                    return;
                 }
 
-                SelectedReaderTextBox.Foreground = AccentBrush;
-                SelectedReaderTextBox.Text = _selectedReader;
-                RechargeButton.IsEnabled = true;
-                //#todo
-                //wysylanie ramek APDU do karty - odczyt stanu konta
+                CheckCardType();
+
+                if (IsClientCardType)
+                {
+                    SelectedReaderTextBox.Foreground = AccentBrush;
+                    SelectedReaderTextBox.Text = _selectedReader;
+                    RechargeStatusTextBox.Text = "";
+                    RechargeButton.IsEnabled = true;
+                    AmountSlider.IsEnabled = true;
+                    AmountTextBox.IsEnabled = true;
+                    ReadCurrentBalance();
+                }
+                else
+                {
+                    SelectedReaderTextBox.Foreground = AccentBrush;
+                    SelectedReaderTextBox.Text = _selectedReader;
+                    ReadCurrentBalance();
+                    RechargeButton.IsEnabled = false;
+                    AmountSlider.IsEnabled = false;
+                    AmountTextBox.IsEnabled = false;
+                    RechargeStatusTextBox.Foreground = ErrorBrush;
+                    RechargeStatusTextBox.Text = "Nie można doładować karty sprzedawcy!";                    
+                }
             }
             else
             {
@@ -91,6 +108,75 @@ namespace Eportmonetka
         private void ReadersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedReader = ReadersList.SelectedItem.ToString();
+        }
+
+        private void SendApdu(string command)
+        {
+            try
+            {
+                RespApdu respApdu = Reader.Exchange(command);
+
+                if (respApdu.SW1SW2 == 0x9000)
+                {
+                    if (respApdu.Data != null)
+                    {
+                        if (command == ReadCash)
+                        {
+                            CurrentBalance = Convert.ToInt32(HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", ""), 16);
+                            CurrentBalanceTextLabel.Content = ((double)CurrentBalance / 100).ToString("F2") + " PLN";
+                        }
+
+                        if (command == ReadInfocard)
+                        {
+                            string CardResponse = HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", string.Empty);
+                            if (CardResponse == "10")
+                            {
+                                IsClientCardType = true;
+                            }
+                        }
+                        //RechargeStatusTextBox.Text += HexFormatting.ToHexString(respApdu.Data, true);
+                    }
+                    int response = Convert.ToInt32(respApdu.SW1SW2);
+                    //RechargeStatusTextBox.Text += "Response: " + response.ToString("X").Insert(2, " ");
+                }
+                else
+                {
+                    int response = Convert.ToInt32(respApdu.SW1SW2);
+                    //RechargeStatusTextBox.Text += "Error code: " + response.ToString("X").Insert(2, " ");
+                }
+            }
+            catch (Exception ex)
+            {
+                //RechargeStatusTextBox.Text += ex.Message;
+            }
+        }
+
+        private void ReadCurrentBalance()
+        {
+            SendApdu(SelectMf);
+            SendApdu(SelectDfBank);
+            SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32");
+            SendApdu(SelectCash);
+            SendApdu(ReadCash);
+        }
+
+        private void RechargeCard()
+        {
+            SendApdu(SelectMf);
+            SendApdu(SelectDfBank);
+            SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32");
+            SendApdu(SelectCash);
+
+            RechargeAmount = (int.Parse(AmountTextBox.Text) * 100) + CurrentBalance;
+
+            SendApdu(UpdateCash + RechargeAmount.ToString("X32"));
+        }
+
+        private void CheckCardType()
+        {
+            SendApdu(SelectMf);
+            SendApdu(SelectInfocard);
+            SendApdu(ReadInfocard);
         }
     }
 }

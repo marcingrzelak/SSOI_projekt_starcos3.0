@@ -43,6 +43,7 @@
     <Reference Include="GS.HexLibrary">
       <HintPath>Libs\GS.HexLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -73,11 +74,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Constants\Commands.cs" />
+    <Compile Include="Constants\ThemeColors.cs" />
     <Compile Include="RechargeWindow.xaml.cs">
       <DependentUpon>RechargeWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TransactionSummaryWindow.xaml.cs">
-      <DependentUpon>TransactionSummaryWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="TransactionWindow.xaml.cs">
       <DependentUpon>TransactionWindow.xaml</DependentUpon>
@@ -124,10 +124,6 @@
     <Page Include="Themes\MetroDark\Theme.Colors.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="TransactionSummaryWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TransactionWindow.xaml">
       <SubType>Designer</SubType>

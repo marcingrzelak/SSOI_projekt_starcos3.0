@@ -18,6 +18,8 @@ using GS.PCSC;
 using GS.SCard;
 using GS.Util.Hex;
 using System.ComponentModel;
+using static Eportmonetka.Constants.Commands;
+using static Eportmonetka.Constants.ThemeColors;
 
 namespace Eportmonetka
 {
@@ -34,7 +36,13 @@ namespace Eportmonetka
         public string[] VendorReaders { get; set; }
         public bool IsSelectedClientReader { get; set; }
         public bool IsSelectedVendorReader { get; set; }
-        public double CurrentBalance { get; set; }
+        public int CurrentClientBalance { get; set; }
+        public int CurrentVendorBalance { get; set; }
+        public int TransactionAmount { get; set; }
+        public bool IsClientCardType { get; set; }
+        public bool IsVendorCardType { get; set; }
+        public int NewClientBalance { get; set; }
+        public int NewVendorBalance { get; set; }
 
         private string _selectedClientReader;
         private string _selectedVendorReader;
@@ -63,9 +71,9 @@ namespace Eportmonetka
             VendorReaders = VendorReader.SCard.ListReaders();
             VendorReadersList.ItemsSource = VendorReaders;
 
-            ForegroundBrush = (Brush)converter.ConvertFromString("#BABABA");
-            ErrorBrush = (Brush)converter.ConvertFromString("#FFD0284C");
-            AccentBrush = (Brush)converter.ConvertFromString("#FF0086AF");
+            ForegroundBrush = (Brush)converter.ConvertFromString(Text);
+            ErrorBrush = (Brush)converter.ConvertFromString(Error);
+            AccentBrush = (Brush)converter.ConvertFromString(Accent);
 
             Items.Add(new Product() { IsChecked = false, Name = "Towar1", Price = 4.00, Quantity = 0 });
             Items.Add(new Product() { IsChecked = false, Name = "Towar2", Price = 20.00, Quantity = 0 });
@@ -75,9 +83,6 @@ namespace Eportmonetka
             Items.Add(new Product() { IsChecked = false, Name = "Towar6", Price = 3.59, Quantity = 0 });
 
             ProductsListView.ItemsSource = Items;
-
-            //CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(ProductsListView.ItemsSource);
-            //view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
         }
 
         private void Connect(PCSCReader pReader, string pSelectedReader)
@@ -97,23 +102,34 @@ namespace Eportmonetka
                 catch (WinSCardException ex)
                 {
                     MessageBox.Show(ex.WinSCardFunctionName + " Błąd 0x" + ex.Status.ToString("X08") + ": " + ex.Message);
+                    return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
+                    return;
                 }
 
-                SelectedClientReaderTextBox.Foreground = AccentBrush;
-                SelectedClientReaderTextBox.Text = _selectedClientReader;
-                IsSelectedClientReader = true;
-                if(IsSelectedVendorReader==true)
+                CheckCardType(ClientReader);
+
+                if (IsClientCardType)
+                {
+                    SelectedClientReaderTextBox.Foreground = AccentBrush;
+                    SelectedClientReaderTextBox.Text = _selectedClientReader;
+                    ReadCurrentBalance(ClientReader);
+                    IsSelectedClientReader = true;
+                }
+                else if (IsVendorCardType)
+                {
+                    SelectedClientReaderTextBox.Foreground = ErrorBrush;
+                    SelectedClientReaderTextBox.Text = "Wymagany typ karty: klient!";
+                }
+
+                if (IsSelectedClientReader == true && IsSelectedVendorReader == true)
                 {
                     ProductsListView.IsEnabled = true;
+                    SummaryButton.IsEnabled = true;
                 }
-                //#todo
-                //wysylanie ramek APDU do karty - odczyt stanu konta kienta
-                CurrentBalance = 10;
-                CurrentBalanceTextBox.Content = CurrentBalance + " PLN";
             }
             else
             {
@@ -132,18 +148,33 @@ namespace Eportmonetka
                 catch (WinSCardException ex)
                 {
                     MessageBox.Show(ex.WinSCardFunctionName + " Błąd 0x" + ex.Status.ToString("X08") + ": " + ex.Message);
+                    return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
+                    return;
                 }
 
-                SelectedVendorReaderTextBox.Foreground = AccentBrush;
-                SelectedVendorReaderTextBox.Text = _selectedVendorReader;
-                IsSelectedVendorReader = true;
-                if (IsSelectedClientReader==true)
+                CheckCardType(VendorReader);
+
+                if (IsVendorCardType)
+                {
+                    SelectedVendorReaderTextBox.Foreground = AccentBrush;
+                    SelectedVendorReaderTextBox.Text = _selectedVendorReader;
+                    ReadCurrentBalance(VendorReader);
+                    IsSelectedVendorReader = true;
+                }
+                else if (IsClientCardType)
+                {
+                    SelectedVendorReaderTextBox.Foreground = ErrorBrush;
+                    SelectedVendorReaderTextBox.Text = "Wymagany typ karty: sprzedawca!";
+                }
+
+                if (IsSelectedClientReader == true && IsSelectedVendorReader == true)
                 {
                     ProductsListView.IsEnabled = true;
+                    SummaryButton.IsEnabled = true;
                 }
             }
             else
@@ -155,20 +186,20 @@ namespace Eportmonetka
         private void QuantityTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             (sender as TextBox).GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            double sum = 0.0;
+            TransactionAmount = 0;
             foreach (var item in Items)
             {
                 if (item.IsChecked)
                 {
                     if (item.Quantity != 0)
                     {
-                        sum += item.Quantity * item.Price;
+                        TransactionAmount += item.Quantity * (int)(item.Price * 100);
                     }
                 }
             }
-            if (sum>CurrentBalance)
+            if (TransactionAmount > CurrentClientBalance)
             {
-                SumTextBox.Foreground = Brushes.Red;
+                SumTextBox.Foreground = ErrorBrush;
                 (sender as TextBox).GetBindingExpression(TextBox.TextProperty).UpdateSource();
             }
             else
@@ -176,37 +207,37 @@ namespace Eportmonetka
                 SumTextBox.Foreground = ForegroundBrush;
                 (sender as TextBox).GetBindingExpression(TextBox.TextProperty).UpdateSource();
             }
-            SumTextBox.Text = sum.ToString() + " PLN";
+            SumTextBox.Text = ((double)TransactionAmount / 100).ToString("F2") + " PLN";
         }
 
         private void CheckBox_Change(object sender, RoutedEventArgs e)
         {
-            double sum = 0.0;
+            TransactionAmount = 0;
             foreach (var item in Items)
             {
                 if (item.IsChecked)
                 {
                     if (item.Quantity != 0)
                     {
-                        sum += item.Quantity * item.Price;
+                        TransactionAmount += item.Quantity * (int)(item.Price * 100);
                     }
                 }
             }
-            if (sum > CurrentBalance)
+            if (TransactionAmount > CurrentClientBalance)
             {
-                SumTextBox.Foreground = Brushes.Red;
+                SumTextBox.Foreground = ErrorBrush;
             }
             else
             {
                 SumTextBox.Foreground = ForegroundBrush;
             }
 
-            SumTextBox.Text = sum.ToString() + " PLN";
+            SumTextBox.Text = ((double)TransactionAmount / 100).ToString("F2") + " PLN";
         }
 
         private void SummaryButton_Click(object sender, RoutedEventArgs e)
         {
-            string shopList = "";
+            /*string shopList = "";
             foreach (var item in Items)
             {
                 if (item.IsChecked)
@@ -214,9 +245,21 @@ namespace Eportmonetka
                     shopList += item.Name + " " + item.Quantity.ToString() + "x" + item.Price.ToString() + " ";
                 }
             }
-            shopList += "SUMA: " + SumTextBox.Text;
-            TransactionSummaryWindow window = new TransactionSummaryWindow();
-            window.ShowDialog();
+            shopList += "SUMA: " + SumTextBox.Text;*/
+
+            if (TransactionAmount > CurrentClientBalance)
+            {
+                TransactionStatusTextBox.Foreground = ErrorBrush;
+                TransactionStatusTextBox.Text = "Brak wystarczających środków na koncie!";
+            }
+            else
+            {
+                Transaction();
+                IsClientCardType = true;
+                IsVendorCardType = false;
+                ReadCurrentBalance(ClientReader);
+            }
+
         }
 
         private void ClientReadersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -227,6 +270,100 @@ namespace Eportmonetka
         private void VendorReadersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedVendorReader = VendorReadersList.SelectedItem.ToString();
+        }
+
+        private void SendApdu(string command, PCSCReader Reader)
+        {
+            try
+            {
+                RespApdu respApdu = Reader.Exchange(command);
+
+                if (respApdu.SW1SW2 == 0x9000)
+                {
+                    if (respApdu.Data != null)
+                    {
+                        if (command == ReadCash)
+                        {
+                            if(IsClientCardType)
+                            {
+                                CurrentClientBalance = Convert.ToInt32(HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", ""), 16);
+                                CurrentClientBalanceTextLabel.Content = ((double)CurrentClientBalance / 100).ToString("F2") + " PLN";
+                            }
+                            else if (IsVendorCardType)
+                            {
+                                CurrentVendorBalance = Convert.ToInt32(HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", ""), 16);
+                            }
+                        }
+
+                        if (command == ReadInfocard)
+                        {
+                            string CardResponse = HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", string.Empty);
+                            if (CardResponse == "10")
+                            {
+                                IsClientCardType = true;
+                                IsVendorCardType = false;
+                            }
+                            if (CardResponse == "01")
+                            {
+                                IsClientCardType = false;
+                                IsVendorCardType = true;
+                            }
+                        }
+                        //RechargeStatusTextBox.Text += HexFormatting.ToHexString(respApdu.Data, true);
+                    }
+                    int response = Convert.ToInt32(respApdu.SW1SW2);
+                    //RechargeStatusTextBox.Text += "Response: " + response.ToString("X").Insert(2, " ");
+                }
+                else
+                {
+                    int response = Convert.ToInt32(respApdu.SW1SW2);
+                    //RechargeStatusTextBox.Text += "Error code: " + response.ToString("X").Insert(2, " ");
+                }
+            }
+            catch (Exception ex)
+            {
+                //StatusTextBox.Text += ex.Message;
+            }
+        }
+
+        private void CheckCardType(PCSCReader Reader)
+        {
+            SendApdu(SelectMf, Reader);
+            SendApdu(SelectInfocard, Reader);
+            SendApdu(ReadInfocard, Reader);
+        }
+
+        private void ReadCurrentBalance(PCSCReader Reader)
+        {
+            SendApdu(SelectMf, Reader);
+            SendApdu(SelectDfBank, Reader);
+            SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32", Reader);
+            SendApdu(SelectCash, Reader);
+            SendApdu(ReadCash, Reader);
+        }
+
+        private void Transaction()
+        {
+            IsClientCardType = true;
+            IsVendorCardType = false;
+
+            SendApdu(SelectMf, ClientReader);
+            SendApdu(SelectDfBank, ClientReader);
+            SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32", ClientReader);
+            SendApdu(SelectCash, ClientReader);
+            NewClientBalance = CurrentClientBalance - TransactionAmount;
+            SendApdu(UpdateCash + NewClientBalance.ToString("X32"), ClientReader);
+
+            IsClientCardType = false;
+            IsVendorCardType = true;
+
+            SendApdu(SelectMf, VendorReader);
+            SendApdu(SelectDfBank, VendorReader);
+            SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32", VendorReader);
+            SendApdu(SelectCash, VendorReader);
+
+            NewVendorBalance = CurrentVendorBalance + TransactionAmount;
+            SendApdu(UpdateCash + NewVendorBalance.ToString("X32"), VendorReader);
         }
     }
 }

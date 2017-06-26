@@ -17,8 +17,8 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
-        <Button Name="InitButton" Grid.Column="0" Grid.Row="0" Content="Inicjalizacja karty" Margin="10,10,10,10" BorderBrush="#BABABA" Foreground="#BABABA" FontSize="16" FontWeight="Bold" Background="Transparent" Click="InitButton_Click"></Button>
-        <Button Name="RechargeButton" Grid.Column="1" Grid.Row="0"  Content="Doładowanie karty" Margin="10,10,10,10" BorderBrush="#BABABA" Foreground="#BABABA" FontSize="16" FontWeight="Bold" Background="Transparent" Click="RechargeButton_Click"></Button>
-        <Button Name="TransactionButton" Grid.ColumnSpan="2" Grid.Row="1" Content="Rozpocznij transakcję" Margin="10,10,10,10" BorderBrush="#BABABA" Foreground="#BABABA" FontSize="16" FontWeight="Bold" Background="Transparent" Click="TransactionButton_Click"></Button>
+        <Button Name="InitButton" Grid.Column="0" Grid.Row="0" Content="Inicjalizacja karty" Click="InitButton_Click" Style="{StaticResource MainWindowButtonStyle}"></Button>
+        <Button Name="RechargeButton" Grid.Column="1" Grid.Row="0" Content="Doładowanie karty" Click="RechargeButton_Click" Style="{StaticResource MainWindowButtonStyle}"></Button>
+        <Button Name="TransactionButton" Grid.ColumnSpan="2" Grid.Row="1" Content="Rozpocznij transakcję" Click="TransactionButton_Click" Style="{StaticResource MainWindowButtonStyle}"></Button>
     </Grid>
 </Window>

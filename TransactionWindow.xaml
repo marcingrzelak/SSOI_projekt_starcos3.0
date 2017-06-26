@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Eportmonetka"
         mc:Ignorable="d"
-        Title="Nowa transakcja" Height="330" Width="835">
-    
+        Title="Nowa transakcja" Height="330" Width="835" ResizeMode="NoResize">
+
     <Window.Resources>
         <DataTemplate x:Key="TextBoxTemplate">
             <TextBox x:Name="QuantityTextBox" Width="50" TextChanged="QuantityTextBox_TextChanged" Text="{Binding Quantity, UpdateSourceTrigger=Explicit}"></TextBox>
@@ -30,7 +30,7 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        
+
         <Border Grid.Column="1" Grid.RowSpan="3" BorderThickness="1,0,1,0" BorderBrush="#BABABA"></Border>
 
         <Label Name="SelectClientReaderLabel" Content="Wybierz czytnik klienta:" Style="{StaticResource SelectReaderLabelStyle}"/>
@@ -45,10 +45,10 @@
         <Label Name="SelectedVendorReaderLabel" Style="{StaticResource SelectedReaderLabelStyle}" Grid.Row="2" Grid.Column="3" />
         <TextBox Name="SelectedVendorReaderTextBox" Style="{StaticResource SelectedReaderTextBoxStyle}" Grid.Row="2" Grid.Column="3"/>
 
-        <Label Name="CurrentBalanceLabel" Content="Stan konta klienta:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="10,10,0,0" Foreground="#BABABA" />
-        <Label Name="CurrentBalanceTextBox" Content="0 PLN" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" HorizontalContentAlignment="Left" Margin="117,10,0,0" Height="26" Width="50" Foreground="#BABABA" Background="Transparent" BorderBrush="#BABABA" BorderThickness="0"/>
+        <Label Name="CurrentClientBalanceLabel" Content="Stan konta klienta:" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="10,10,0,0" Foreground="#BABABA" />
+        <Label Name="CurrentClientBalanceTextLabel" Content="0 PLN" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" HorizontalContentAlignment="Left" Margin="116.667,10,0,0" Height="26" Width="254" Foreground="#BABABA" Background="Transparent" BorderBrush="#BABABA" BorderThickness="0"/>
 
-        <ListView Name="ProductsListView" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Stretch" Width="361" IsEnabled="True" Background="#181818" BorderBrush="#BABABA" Foreground="#BABABA">
+        <ListView Name="ProductsListView" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Stretch" Width="361" IsEnabled="False" Background="#181818" BorderBrush="#BABABA" Foreground="#BABABA">
             <ListView.Resources>
                 <Style TargetType="{x:Type GridViewColumnHeader}">
                     <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -63,11 +63,18 @@
                     <GridViewColumn Header="Ilość" Width="65" CellTemplate="{StaticResource TextBoxTemplate}"/>
                 </GridView>
             </ListView.View>
+            <!--<ListView.View Style="{StaticResource ListViewContainerStyle}">                
+            </ListView.View>-->
         </ListView>
 
         <Label Content="Suma:" Grid.Column="1" HorizontalAlignment="Left" Margin="9.667,10,0,0" Grid.Row="2" VerticalAlignment="Top" Foreground="#BABABA"/>
         <TextBox Name="SumTextBox" Text="0 PLN" Grid.Column="1" HorizontalAlignment="Left" Height="21" Margin="55.667,15.333,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" Width="315" BorderThickness="0" Background="Transparent" Foreground="#BABABA"/>
-        <Button Name="SummaryButton"  Content="Podsumowanie" Style="{StaticResource TransactionSummaryButtonStyle}" Grid.Column="1" Grid.Row="2" Click="SummaryButton_Click"/>
+        <Button Name="SummaryButton" Content="Kup i zapłać" Style="{StaticResource TransactionSummaryButtonStyle}" Grid.Column="1" Grid.Row="2" IsEnabled="False" Click="SummaryButton_Click"/>
+        <TextBox Name="TransactionStatusTextBox" Style="{StaticResource InitRechargeTransactionStatusTextBoxStyle}" />
 
     </Grid>
 </Window>
+
+    
+    
+    
