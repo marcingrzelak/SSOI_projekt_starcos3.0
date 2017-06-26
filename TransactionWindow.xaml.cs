@@ -1,25 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Diagnostics;
 using GS.Apdu;
 using GS.PCSC;
 using GS.SCard;
 using GS.Util.Hex;
-using System.ComponentModel;
 using static Eportmonetka.Constants.Commands;
 using static Eportmonetka.Constants.ThemeColors;
+using Eportmonetka.SET_Lib;
 
 namespace Eportmonetka
 {
@@ -43,6 +34,8 @@ namespace Eportmonetka
         public bool IsVendorCardType { get; set; }
         public int NewClientBalance { get; set; }
         public int NewVendorBalance { get; set; }
+        public bool IsReadCash { get; set; }
+
 
         private string _selectedClientReader;
         private string _selectedVendorReader;
@@ -116,7 +109,9 @@ namespace Eportmonetka
                 {
                     SelectedClientReaderTextBox.Foreground = AccentBrush;
                     SelectedClientReaderTextBox.Text = _selectedClientReader;
+                    IsReadCash = true;
                     ReadCurrentBalance(ClientReader);
+                    IsReadCash = false;
                     IsSelectedClientReader = true;
                 }
                 else if (IsVendorCardType)
@@ -162,7 +157,9 @@ namespace Eportmonetka
                 {
                     SelectedVendorReaderTextBox.Foreground = AccentBrush;
                     SelectedVendorReaderTextBox.Text = _selectedVendorReader;
+                    IsReadCash = true;
                     ReadCurrentBalance(VendorReader);
+                    IsReadCash = false;
                     IsSelectedVendorReader = true;
                 }
                 else if (IsClientCardType)
@@ -242,10 +239,11 @@ namespace Eportmonetka
             {
                 if (item.IsChecked)
                 {
-                    shopList += item.Name + " " + item.Quantity.ToString() + "x" + item.Price.ToString() + " ";
+                    shopList += "N:" + item.Name + " " + item.Quantity.ToString() + "x" + item.Price.ToString() + " ";
                 }
             }
-            shopList += "SUMA: " + SumTextBox.Text;*/
+            shopList += "SUMA: " + SumTextBox.Text;
+            */
 
             if (TransactionAmount > CurrentClientBalance)
             {
@@ -257,7 +255,12 @@ namespace Eportmonetka
                 Transaction();
                 IsClientCardType = true;
                 IsVendorCardType = false;
+                IsReadCash = true;
                 ReadCurrentBalance(ClientReader);
+                IsClientCardType = false;
+                IsVendorCardType = true;
+                ReadCurrentBalance(VendorReader);
+                IsReadCash = false;
             }
 
         }
@@ -282,16 +285,18 @@ namespace Eportmonetka
                 {
                     if (respApdu.Data != null)
                     {
-                        if (command == ReadCash)
+                        if (command == ReadCash && IsReadCash)
                         {
-                            if(IsClientCardType)
+                            if (IsClientCardType)
                             {
-                                CurrentClientBalance = Convert.ToInt32(HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", ""), 16);
+                                byte[] DecryptedBalance = MainWindow.Bank.DecryptRSA(respApdu.Data, true);
+                                CurrentClientBalance = (DecryptedBalance[0] << 24) + (DecryptedBalance[1] << 16) + (DecryptedBalance[2] << 8) + (DecryptedBalance[3] << 0);
                                 CurrentClientBalanceTextLabel.Content = ((double)CurrentClientBalance / 100).ToString("F2") + " PLN";
                             }
                             else if (IsVendorCardType)
                             {
-                                CurrentVendorBalance = Convert.ToInt32(HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", ""), 16);
+                                byte[] DecryptedBalance = MainWindow.Bank.DecryptRSA(respApdu.Data, true);
+                                CurrentVendorBalance = (DecryptedBalance[0] << 24) + (DecryptedBalance[1] << 16) + (DecryptedBalance[2] << 8) + (DecryptedBalance[3] << 0);
                             }
                         }
 
@@ -344,6 +349,19 @@ namespace Eportmonetka
 
         private void Transaction()
         {
+            SET_Lib.Transaction paragon = new SET_Lib.Transaction("user", "shop");
+            foreach (var item in Items)
+            {
+                if(item.IsChecked==true)
+                {
+                    paragon.AddToTransac(new TransacItem(item.Name, (short)item.Quantity, (float)item.Price));
+                }                    
+            }
+            bool[] rules = { true, true, true, true };
+            string fullParagon = paragon.Print(rules, 0);
+
+
+
             IsClientCardType = true;
             IsVendorCardType = false;
 
@@ -352,7 +370,17 @@ namespace Eportmonetka
             SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32", ClientReader);
             SendApdu(SelectCash, ClientReader);
             NewClientBalance = CurrentClientBalance - TransactionAmount;
-            SendApdu(UpdateCash + NewClientBalance.ToString("X32"), ClientReader);
+
+            byte[] EncryptedAmount = new byte[ConstRSA.RSAKeyLength / 8];
+
+            byte[] porcje = new byte[4];
+            porcje[0] = (byte)((NewClientBalance >> 24) & 255);
+            porcje[1] = (byte)((NewClientBalance >> 16) & 255);
+            porcje[2] = (byte)((NewClientBalance >> 8) & 255);
+            porcje[3] = (byte)((NewClientBalance >> 0) & 255);
+            EncryptedAmount = MainWindow.Bank.EncryptRSA(porcje, true);
+
+            SendApdu(UpdateCash + ConstRSA.SecureByteToString(EncryptedAmount), ClientReader);
 
             IsClientCardType = false;
             IsVendorCardType = true;
@@ -363,7 +391,16 @@ namespace Eportmonetka
             SendApdu(SelectCash, VendorReader);
 
             NewVendorBalance = CurrentVendorBalance + TransactionAmount;
-            SendApdu(UpdateCash + NewVendorBalance.ToString("X32"), VendorReader);
+            EncryptedAmount = new byte[ConstRSA.RSAKeyLength / 8];
+
+            porcje = new byte[4];
+            porcje[0] = (byte)((NewVendorBalance >> 24) & 255);
+            porcje[1] = (byte)((NewVendorBalance >> 16) & 255);
+            porcje[2] = (byte)((NewVendorBalance >> 8) & 255);
+            porcje[3] = (byte)((NewVendorBalance >> 0) & 255);
+            EncryptedAmount = MainWindow.Bank.EncryptRSA(porcje, true);
+
+            SendApdu(UpdateCash + ConstRSA.SecureByteToString(EncryptedAmount), VendorReader);
         }
     }
 }

@@ -8,6 +8,14 @@
         public const string UpdateInfocardClient = "00 DC 01 04 01 10";
         public const string UpdateInfocardVendor = "00 DC 01 04 01 01";
         public const string SelectDfUser = "00 A4 01 0C 02 00 10";
+        public const string SelectUserRsa128 = "00 A4 02 0C 02 01 28";
+        public const string SelectUserRsa64 = "00 A4 02 0C 02 00 64";
+        public const string SelectUserRsa3 = "00 A4 02 0C 02 00 03";
+        public const string ReadRecord1 = "00 B2 01 04 00";
+        public const string ReadRecord2 = "00 B2 02 04 00";
+        public const string ReadRecord3 = "00 B2 03 04 00";
+        public const string ReadRecord4 = "00 B2 04 04 00";
+        public const string ReadRecord5 = "00 B2 05 04 00";
         public const string SelectUserRsa = "00 A4 02 0C 02 00 01";
         public const string ChangeUserPin = "00 24 00 81 0D 31 32 33 34 35"; //dopisac
         public const string UnlockUserPin = "00 20 00 81 08"; //dopisac
@@ -23,12 +31,7 @@
         public const string SelectBankRsa = "00 A4 02 0C 02 00 01";
         public const string ReadFirstBankRsaRecord = "00 B2 01 04 00";
         public const string SelectCash = "00 A4 02 0C 02 00 02";
-        public const string ReadCash = "00 B2 01 04 10";
-        public const string UpdateCash = "00 DC 01 04 10"; //dopisac
-        public const string UpdateCashInit1 = "00 DC 01 04 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 F4"; //do testow, powinno byc zaszyfrowane, 5-ty bajt to dlugosc - trzeba zmieniac
-        public const string UpdateCashInit2 = "00 DC 01 04 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 03 E8"; //do testow, powinno byc zaszyfrowane
-        public const string UpdateCashInit3 = "00 DC 01 04 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 D0"; //do testow, powinno byc zaszyfrowane
-        public const string UpdateCashInit4 = "00 DC 01 04 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 13 88"; //do testow, powinno byc zaszyfrowane
-        public const string UpdateCashInit5 = "00 DC 01 04 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 27 10"; //do testow, powinno byc zaszyfrowane
+        public const string ReadCash = "00 B2 01 04 00";
+        public const string UpdateCash = "00 DC 01 04 80"; //dopisac
     }
 }

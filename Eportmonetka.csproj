@@ -75,10 +75,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constants\Commands.cs" />
+    <Compile Include="Constants\Keys.cs" />
     <Compile Include="Constants\ThemeColors.cs" />
     <Compile Include="RechargeWindow.xaml.cs">
       <DependentUpon>RechargeWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SET_Lib\AESKey.cs" />
+    <Compile Include="SET_Lib\ConstRSA.cs" />
+    <Compile Include="SET_Lib\Program.cs" />
+    <Compile Include="SET_Lib\RSAParticipant.cs" />
+    <Compile Include="SET_Lib\TransacItem.cs" />
+    <Compile Include="SET_Lib\Transaction.cs" />
     <Compile Include="TransactionWindow.xaml.cs">
       <DependentUpon>TransactionWindow.xaml</DependentUpon>
     </Compile>

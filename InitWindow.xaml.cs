@@ -3,12 +3,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Diagnostics;
+using System.Text;
 using GS.Apdu;
 using GS.PCSC;
 using GS.SCard;
 using GS.Util.Hex;
 using static Eportmonetka.Constants.Commands;
 using static Eportmonetka.Constants.ThemeColors;
+using Eportmonetka.SET_Lib;
 
 namespace Eportmonetka
 {
@@ -147,7 +149,7 @@ namespace Eportmonetka
                     InitButton.IsEnabled = true;
                     TypeGroupBox.IsEnabled = true;
                     InitAmountGroupBox.IsEnabled = true;
-                }                
+                }
             }
             else
             {
@@ -212,6 +214,25 @@ namespace Eportmonetka
             SendApdu(SelectDfUser);
             SendApdu(ChangeUserPin + " 31 31 31 31 31 31 31 31");
             SendApdu(UnlockUserPin + " 31 31 31 31 31 31 31 31");
+
+            RSAParticipant user = new RSAParticipant();
+            user.KeysGeneration(ConstRSA.RSAKeyLength);
+            string[] parametrs = user.SafeParams;
+
+            SendApdu(SelectUserRsa128);
+            SendApdu("00 DC 01 04 80" + parametrs[0]); //write (d)
+            SendApdu("00 DC 02 04 80" + parametrs[5]); //write (N)
+
+            SendApdu(SelectUserRsa64);
+            SendApdu("00 DC 01 04 40" + parametrs[1]); //write (dp)
+            SendApdu("00 DC 02 04 40" + parametrs[2]); //write (dq)
+            SendApdu("00 DC 03 04 40" + parametrs[4]); //write (1/q)
+            SendApdu("00 DC 04 04 40" + parametrs[6]); //write (p)
+            SendApdu("00 DC 05 04 40" + parametrs[7]); //write (q)
+
+            SendApdu(SelectUserRsa3);
+            SendApdu("00 DC 01 04 03" + parametrs[3]); //write (e)
+
             SendApdu(SelectMf);
             SendApdu(SelectDfBank);
             SendApdu(ChangeBankPin + "32 32 32 32 32 32 32 32");
@@ -221,36 +242,24 @@ namespace Eportmonetka
             {
                 SendApdu(SelectCash);
 
-                int index = 0;
+                byte[] EncryptedAmount = new byte[ConstRSA.RSAKeyLength/8];
+                int amount;
 
                 for (int i = 0; i < InitAmounts.Length; i++)
                 {
                     if (InitAmounts[i].IsChecked == true)
                     {
-                        index = i;
+                        amount = int.Parse(InitAmounts[i].Content.ToString().Replace(" PLN", string.Empty))*100;
+                        byte[] porcje = new byte[4];
+                        porcje[0] = (byte)((amount >> 24) & 255);
+                        porcje[1] = (byte)((amount >> 16) & 255);
+                        porcje[2] = (byte)((amount >> 8) & 255);
+                        porcje[3] = (byte)((amount >> 0) & 255);
+                        EncryptedAmount = MainWindow.Bank.EncryptRSA(porcje, true);
                     }
                 }
 
-                switch (index)
-                {
-                    case 0:
-                        SendApdu(UpdateCashInit1);
-                        break;
-                    case 1:
-                        SendApdu(UpdateCashInit2);
-                        break;
-                    case 2:
-                        SendApdu(UpdateCashInit3);
-                        break;
-                    case 3:
-                        SendApdu(UpdateCashInit4);
-                        break;
-                    case 4:
-                        SendApdu(UpdateCashInit5);
-                        break;
-                    default:
-                        break;
-                }
+                SendApdu(UpdateCash + ConstRSA.SecureByteToString(EncryptedAmount));                    
             }
         }
 

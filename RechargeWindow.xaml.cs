@@ -3,12 +3,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Diagnostics;
+using System.Text;
 using GS.Apdu;
 using GS.PCSC;
 using GS.SCard;
 using GS.Util.Hex;
 using static Eportmonetka.Constants.Commands;
 using static Eportmonetka.Constants.ThemeColors;
+using Eportmonetka.SET_Lib;
 
 namespace Eportmonetka
 {
@@ -23,6 +25,7 @@ namespace Eportmonetka
         public int CurrentBalance { get; set; }
         public int RechargeAmount { get; set; }
         public bool IsClientCardType { get; set; }
+        public bool IsReadCash { get; set; }
 
         private string _selectedReader;
         BrushConverter converter = new BrushConverter();
@@ -51,7 +54,9 @@ namespace Eportmonetka
             RechargeStatusTextBox.Foreground = AccentBrush;
             RechargeStatusTextBox.Text = "Karta doładowana kwotą " + AmountTextBox.Text + " PLN";
             CurrentBalanceTextLabel.Content = ((double)RechargeAmount / 100).ToString("F2") + " PLN";
+            IsReadCash = true;
             ReadCurrentBalance();
+            IsReadCash = false;
         }
 
         private void SelectReaderButton_Click(object sender, RoutedEventArgs e)
@@ -85,18 +90,22 @@ namespace Eportmonetka
                     RechargeButton.IsEnabled = true;
                     AmountSlider.IsEnabled = true;
                     AmountTextBox.IsEnabled = true;
+                    IsReadCash = true;
                     ReadCurrentBalance();
+                    IsReadCash = false;
                 }
                 else
                 {
                     SelectedReaderTextBox.Foreground = AccentBrush;
                     SelectedReaderTextBox.Text = _selectedReader;
+                    IsReadCash = true;
                     ReadCurrentBalance();
+                    IsReadCash = false;
                     RechargeButton.IsEnabled = false;
                     AmountSlider.IsEnabled = false;
                     AmountTextBox.IsEnabled = false;
                     RechargeStatusTextBox.Foreground = ErrorBrush;
-                    RechargeStatusTextBox.Text = "Nie można doładować karty sprzedawcy!";                    
+                    RechargeStatusTextBox.Text = "Nie można doładować karty sprzedawcy!";
                 }
             }
             else
@@ -120,9 +129,10 @@ namespace Eportmonetka
                 {
                     if (respApdu.Data != null)
                     {
-                        if (command == ReadCash)
+                        if (command == ReadCash && IsReadCash)
                         {
-                            CurrentBalance = Convert.ToInt32(HexFormatting.ToHexString(respApdu.Data, true).Replace(" ", ""), 16);
+                            byte[] DecryptedBalance = MainWindow.Bank.DecryptRSA(respApdu.Data, true);
+                            CurrentBalance = (DecryptedBalance[0] << 24) + (DecryptedBalance[1] << 16) + (DecryptedBalance[2] << 8) + (DecryptedBalance[3] << 0);
                             CurrentBalanceTextLabel.Content = ((double)CurrentBalance / 100).ToString("F2") + " PLN";
                         }
 
@@ -169,7 +179,16 @@ namespace Eportmonetka
 
             RechargeAmount = (int.Parse(AmountTextBox.Text) * 100) + CurrentBalance;
 
-            SendApdu(UpdateCash + RechargeAmount.ToString("X32"));
+            byte[] EncryptedAmount = new byte[ConstRSA.RSAKeyLength / 8];
+
+            byte[] porcje = new byte[4];
+            porcje[0] = (byte)((RechargeAmount >> 24) & 255);
+            porcje[1] = (byte)((RechargeAmount >> 16) & 255);
+            porcje[2] = (byte)((RechargeAmount >> 8) & 255);
+            porcje[3] = (byte)((RechargeAmount >> 0) & 255);
+            EncryptedAmount = MainWindow.Bank.EncryptRSA(porcje, true);
+
+            SendApdu(UpdateCash + ConstRSA.SecureByteToString(EncryptedAmount));
         }
 
         private void CheckCardType()
