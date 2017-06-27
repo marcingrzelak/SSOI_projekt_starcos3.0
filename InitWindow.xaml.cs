@@ -238,29 +238,30 @@ namespace Eportmonetka
             SendApdu(ChangeBankPin + "32 32 32 32 32 32 32 32");
             SendApdu(UnlockBankPin + "32 32 32 32 32 32 32 32");
 
-            if (ClientRadioButton.IsChecked == true)
+
+            SendApdu(SelectCash);
+
+            byte[] EncryptedAmount = new byte[ConstRSA.RSAKeyLength / 8];
+            int amount;
+
+            for (int i = 0; i < InitAmounts.Length; i++)
             {
-                SendApdu(SelectCash);
-
-                byte[] EncryptedAmount = new byte[ConstRSA.RSAKeyLength/8];
-                int amount;
-
-                for (int i = 0; i < InitAmounts.Length; i++)
+                if (InitAmounts[i].IsChecked == true)
                 {
-                    if (InitAmounts[i].IsChecked == true)
-                    {
-                        amount = int.Parse(InitAmounts[i].Content.ToString().Replace(" PLN", string.Empty))*100;
-                        byte[] porcje = new byte[4];
-                        porcje[0] = (byte)((amount >> 24) & 255);
-                        porcje[1] = (byte)((amount >> 16) & 255);
-                        porcje[2] = (byte)((amount >> 8) & 255);
-                        porcje[3] = (byte)((amount >> 0) & 255);
-                        EncryptedAmount = MainWindow.Bank.EncryptRSA(porcje, true);
-                    }
+                    amount = int.Parse(InitAmounts[i].Content.ToString().Replace(" PLN", string.Empty)) * 100;
+                    byte[] porcje = new byte[4];
+                    porcje[0] = (byte)((amount >> 24) & 255);
+                    porcje[1] = (byte)((amount >> 16) & 255);
+                    porcje[2] = (byte)((amount >> 8) & 255);
+                    porcje[3] = (byte)((amount >> 0) & 255);
+                    EncryptedAmount = MainWindow.Bank.EncryptRSA(porcje, true);
                 }
-
-                SendApdu(UpdateCash + ConstRSA.SecureByteToString(EncryptedAmount));                    
             }
+
+            SendApdu(UpdateCash + ConstRSA.SecureByteToString(EncryptedAmount));
+
+            InitButton.IsEnabled = false;
+
         }
 
         private void CheckInit()
